@@ -68,6 +68,8 @@ void ScannerEventListener::GetScanners()
     for(int x=0; x<count; x++)
     {
         std:: cout  << "Scanner IDs : " << list[x] << endl;
+        scanner_attached = true;
+        std:: cout  << "scanner_attached " << scanner_attached << endl;
     }
     std:: cout  << "Out XML : " << outXml.data() << endl;
     std:: cout  << "================================" << endl << endl;
@@ -421,9 +423,12 @@ void ScannerEventListener::OnPNPEvent( short eventType, std::string ppnpData )
     if (eventType == SCANNER_ATTACHED) {
         std:: cout  << "Scanner attached" << endl;
         str = ppnpData;
+        scanner_attached = true;
+        std:: cout  << "scanner_attached " << scanner_attached << endl;
     } else if (eventType == SCANNER_DETACHED) {
         std:: cout  << "Scanner detached" << endl;
         str =  ppnpData;
+        scanner_attached = false;
     } else {
         str = " UNKNOWN PNP Event ";
     }

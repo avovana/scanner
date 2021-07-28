@@ -51,4 +51,6 @@ public:
 
     std::string get_decode_data(std::string outXml);
     std::vector<std::string> stringTokernize(std::string inStr, char cDelim);
+
+    bool scanner_attached = false;
 };
