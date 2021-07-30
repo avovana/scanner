@@ -23,11 +23,29 @@
 
 ScannerEventListener::ScannerEventListener()
 {
-    //barCodeEvent = barCodeEvent_;
+    std::shared_ptr<TTransport> socket(new TSocket("localhost", 9090));
+    std::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
+
+    thrift_client.reset(new SlaveControllerClient(protocol));
+
+    try {
+        transport->open();
+
+        thrift_client->scanner_status(ScannerStatus::Ready);
+        cout << "scanner_status" << endl;
+        thrift_client->scanner_status(ScannerStatus::Stop);
+        cout << "scanner_status" << endl;
+    }
+    catch (TException &tx) {
+        cout << "ERROR: " << tx.what() << endl;
+    }
+
 }
 
 ScannerEventListener::~ScannerEventListener()
 {
+    transport->close();
 	Close();
 }
 
@@ -478,6 +496,9 @@ void ScannerEventListener::OnBarcodeEvent(short int eventType, std::string & psc
 
     outfile.open("test.txt", std::ios_base::app); // append instead of overwrite
     outfile << decoded_bar_code << endl;
+    outfile.close();
+
+    thrift_client->scan(decoded_bar_code);
 }
 
 // tokernize string for a given delimiter //

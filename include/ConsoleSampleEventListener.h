@@ -12,6 +12,18 @@
 #include "CsBarcodeTypes.h"
 #include "Cslibcorescanner_xml.h"
 
+#include <thrift/protocol/TBinaryProtocol.h>
+#include <thrift/transport/TSocket.h>
+#include <thrift/transport/TTransportUtils.h>
+
+#include "../gen-cpp/SlaveController.h"
+
+using namespace apache::thrift;
+using namespace apache::thrift::protocol;
+using namespace apache::thrift::transport;
+
+using namespace slave_controller;
+
 using namespace std;
 
 class ScannerEventListener : public IEventListenerXml {
@@ -53,4 +65,6 @@ public:
     std::vector<std::string> stringTokernize(std::string inStr, char cDelim);
 
     bool scanner_attached = false;
+    std::shared_ptr<TTransport> transport;
+    std::shared_ptr<SlaveControllerClient> thrift_client;
 };
