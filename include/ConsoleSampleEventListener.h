@@ -50,8 +50,7 @@ public:
     void SetAttribute();
     void SetAttributeStore();
     void SetZeroWeight();
-    void Close();
-    
+
     void RebootScanner();
     void ExecuteActionCommand(CmdOpcode opCode);
     void GetDeviceTopology();

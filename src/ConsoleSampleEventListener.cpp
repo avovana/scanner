@@ -29,24 +29,34 @@ ScannerEventListener::ScannerEventListener()
 
     thrift_client.reset(new SlaveControllerClient(protocol));
 
-    try {
-        transport->open();
+    bool connected = false;
+    while(not connected) {
+        try {
+            transport->open();
+            connected = true;
 
-        thrift_client->scanner_status(ScannerStatus::Ready);
-        cout << "scanner_status" << endl;
-        thrift_client->scanner_status(ScannerStatus::Stop);
-        cout << "scanner_status" << endl;
-    }
-    catch (TException &tx) {
-        cout << "ERROR: " << tx.what() << endl;
+            thrift_client->scanner_status(ScannerStatus::Ready);
+            thrift_client->scanner_status(ScannerStatus::Stop);
+            thrift_client->scanner_status(ScannerStatus::Ready);
+            cout << "thrift_connection=ready INFO" << endl;
+        }
+        catch (TException &tx) {
+            cout << "thrift_connection=not_connected(" << tx.what() << ") ERROR" << endl;
+            std::this_thread::sleep_for(10000ms);
+        }
     }
 
 }
 
-ScannerEventListener::~ScannerEventListener()
-{
+ScannerEventListener::~ScannerEventListener() {
+    cout << __PRETTY_FUNCTION__ << endl;
+    thrift_client->scanner_status(ScannerStatus::Stop);
     transport->close();
-	Close();
+    cout << "thrift_connection=closed INFO " << endl;
+
+    StatusID status;
+    ::Close(0, &status);
+    std:: cout  << "scanner_status=close(" << status << ") INFO" << endl;
 }
 
 StatusID ScannerEventListener::Open()
@@ -327,14 +337,6 @@ void ScannerEventListener::GetVersion() {
          std:: cout  << "GetVersion command failed. Error code : " << sId << endl;
     } 
     std:: cout  << "================================" << endl << endl;
-}
-
-void ScannerEventListener::Close()
-{
-    StatusID status;
-    ::Close(0, &status);
-    std:: cout  << "close" << endl;
-
 }
 
 string getStringFromRawData(unsigned char* rawData,int startIndex, int endIndex){
