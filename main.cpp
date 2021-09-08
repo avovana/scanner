@@ -41,14 +41,6 @@ int main() {
 
     scanner_event_listener.GetScanners();
 
-    // Wait scanner for connect. active waiting
-    while (not scanner_event_listener.scanner_attached) {
-        cout << "scanner_status=not_attached WARN" << endl;
-        this_thread::sleep_for(5000ms);
-    }
-
-    cout << "scanner_status=attached INFO" << endl;
-
     while (not done) {
         cout << "main_thread=works INFO" << endl;
 

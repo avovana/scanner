@@ -35,9 +35,6 @@ ScannerEventListener::ScannerEventListener()
             transport->open();
             connected = true;
 
-            thrift_client->scanner_status(ScannerStatus::Ready);
-            thrift_client->scanner_status(ScannerStatus::Stop);
-            thrift_client->scanner_status(ScannerStatus::Ready);
             cout << "thrift_connection=ready INFO" << endl;
         }
         catch (TException &tx) {
@@ -97,7 +94,10 @@ void ScannerEventListener::GetScanners()
     {
         std:: cout  << "Scanner IDs : " << list[x] << endl;
         scanner_attached = true;
+
+        thrift_client->scanner_status(ScannerStatus::Ready);
         std:: cout  << "scanner_attached " << scanner_attached << endl;
+
     }
     std:: cout  << "Out XML : " << outXml.data() << endl;
     std:: cout  << "================================" << endl << endl;
@@ -444,11 +444,14 @@ void ScannerEventListener::OnPNPEvent( short eventType, std::string ppnpData )
         std:: cout  << "Scanner attached" << endl;
         str = ppnpData;
         scanner_attached = true;
+        thrift_client->scanner_status(ScannerStatus::Ready);
         std:: cout  << "scanner_attached " << scanner_attached << endl;
     } else if (eventType == SCANNER_DETACHED) {
         std:: cout  << "Scanner detached" << endl;
         str =  ppnpData;
+        thrift_client->scanner_status(ScannerStatus::Stop);
         scanner_attached = false;
+        std:: cout  << "scanner_detached " << scanner_attached << endl;
     } else {
         str = " UNKNOWN PNP Event ";
     }
