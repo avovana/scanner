@@ -16,7 +16,7 @@ using namespace std;
 using namespace chrono_literals;
 namespace fs = filesystem;
 
-atomic_bool done = false;
+bool done = false;
 
 void signalHandler( int signum ) {
    cout << "Interrupt signal (" << signum << ") received.\n";
@@ -24,13 +24,14 @@ void signalHandler( int signum ) {
    // cleanup and close up stuff here
    // terminate program
 
-   exit(signum);
+   // exit(signum);
+   done = true;
 }
 
 int main() {
     signal(SIGINT, signalHandler);
 
-    ScannerEventListener scanner_event_listener;
+    ScannerEventListener scanner_event_listener{done};
 
     if (scanner_event_listener.Open() not_eq STATUS_OK) {
         cout << "scanner_status=not_active." << endl;
@@ -44,8 +45,10 @@ int main() {
     while (not done) {
         cout << "main_thread=works INFO" << endl;
 
-        this_thread::sleep_for(10000ms);
+        this_thread::sleep_for(3000ms);
     }
+
+    cout << "exiting..." << endl;
 
     return 0;
 }

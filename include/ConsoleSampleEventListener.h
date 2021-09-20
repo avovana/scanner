@@ -28,7 +28,7 @@ using namespace std;
 
 class ScannerEventListener : public IEventListenerXml {
 public:
-    explicit ScannerEventListener();
+    explicit ScannerEventListener(const bool &done);
     virtual ~ScannerEventListener();
 
     virtual void OnImageEvent( short eventType, int size, short imageFormat, char* sfimageData, int dataLength, std::string& pScannerData );

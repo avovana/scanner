@@ -21,16 +21,16 @@
 #include "pugixml.hpp"
 
 
-ScannerEventListener::ScannerEventListener()
+ScannerEventListener::ScannerEventListener(const bool &done)
 {
     std::shared_ptr<TTransport> socket(new TSocket("localhost", 9090));
-    std::shared_ptr<TTransport> transport(new TBufferedTransport(socket));
+    transport.reset(new TBufferedTransport(socket));
     std::shared_ptr<TProtocol> protocol(new TBinaryProtocol(transport));
 
     thrift_client.reset(new SlaveControllerClient(protocol));
 
     bool connected = false;
-    while(not connected) {
+    while(not connected && not done) {
         try {
             transport->open();
             connected = true;
@@ -47,13 +47,23 @@ ScannerEventListener::ScannerEventListener()
 
 ScannerEventListener::~ScannerEventListener() {
     cout << __PRETTY_FUNCTION__ << endl;
-    thrift_client->scanner_status(ScannerStatus::Stop);
-    transport->close();
-    cout << "thrift_connection=closed INFO " << endl;
+
 
     StatusID status;
     ::Close(0, &status);
     std:: cout  << "scanner_status=close(" << status << ") INFO" << endl;
+
+  //  try {
+        thrift_client->scanner_status(ScannerStatus::Stop);
+        cout << "111" << endl;
+        transport->close();
+        cout << "222" << endl;
+   // } catch (TTransportException &ex) {
+   //     cout << "thrift_connection=closing ex->getType()" << ex.getType() << " " << ex.what() << endl;
+   // } catch (...) {
+   //     cout << "thrift_connection=closing..." << endl;
+   // }
+        cout << "thrift_connection=closed INFO " << endl;
 }
 
 StatusID ScannerEventListener::Open()
